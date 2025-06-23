@@ -91,9 +91,9 @@ function App() {
               onChange={(e) => setName(e.target.value)}/>
         <br />
         <button className='add-item-button' type='button' onClick={addItem}>Add Item</button>
-        <div className='error-container'>
-          {error && <p>{error.message}</p>}
-        </div>
+        {error && <div className='error-container'>
+          <p>{error.message}</p>
+        </div>}
         <ul>
           {items.map(item => 
             <li key={item.id.toString()}>
