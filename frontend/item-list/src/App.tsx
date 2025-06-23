@@ -1,6 +1,8 @@
-import axios from 'axios';
+import { useState, useEffect } from 'react'
+import { FaRegEdit } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 import './App.css'
-import { useState } from 'react';
+import axios from 'axios'
 
 type Item = {
     id: number
@@ -16,6 +18,9 @@ function App() {
   const [items, setItems] = useState<Item []>([]);
   const [error, setError] = useState<Error | undefined>(undefined);
 
+  useEffect(() => {
+    getItems();
+  }, []);
 
   const getItems = () => {
     const URL = `${baseUrl}/view`;
@@ -38,7 +43,7 @@ function App() {
       const item = response.data;
       setItems([...items, item]);
     })
-    .catch(error => console.error(error))
+    .catch(error => setError(error))
     .finally(() => setName(''));
   }
 
@@ -72,13 +77,34 @@ function App() {
       const remainingItems = items.filter(items => items.id !== id);
       setItems(remainingItems);
     })
-    .catch(error => console.error(error))
+    .catch(error => setError(error))
     .finally(() => setName(''));
   }
 
   return (
-    <div>
-
+    <div className='container'>
+        <h2>Item List</h2>
+        <input className='item-input' 
+              type="text" 
+              placeholder='Item Name' 
+              value={name} 
+              onChange={(e) => setName(e.target.value)}/>
+        <br />
+        <button className='add-item-button' type='button' onClick={addItem}>Add Item</button>
+        <div className='error-container'>
+          {error && <p>{error.message}</p>}
+        </div>
+        <ul>
+          {items.map(item => 
+            <li key={item.id.toString()}>
+              <div className='item-edit-container'>
+                <input className='item-edit-input' value={editMode.id !== item.id ? item.name : editMode.name} disabled={item.id !== editMode.id} onChange={(e) => setEditMode({...editMode, name: e.target.value})}/>
+                {item.id !== editMode.id && <button className='delete-button' onClick={() => deleteItem(item.id)}><MdDeleteForever /></button>}
+                {item.id === editMode.id ?  <button className='update-button' onClick={() => updateItem(item.id)}>Update</button> : <button className='edit-button' onClick={() => setEditMode({id: item.id, name: item.name})}><FaRegEdit /></button>}
+              </div>
+            </li>
+          )}
+        </ul>
     </div>
   )
 }
